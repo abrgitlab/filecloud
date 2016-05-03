@@ -6,4 +6,6 @@
  * Time: 23:10
  */
 
-return [];
+return [
+    'media/upload' => 'site/file-upload'
+];
