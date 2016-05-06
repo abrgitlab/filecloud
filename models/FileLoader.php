@@ -13,6 +13,8 @@ use yii\base\Model;
 
 class FileLoader extends Model
 {
+
     public $id = 'fileloader';
     public $file;
+
 }

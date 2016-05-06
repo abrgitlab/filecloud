@@ -7,5 +7,6 @@
  */
 
 return [
-    'media/upload' => 'site/file-upload'
+    'media/upload' => 'site/file-upload',
+    'get/<shortlink:[a-zA-Z/+]+>' => 'site/get',
 ];
