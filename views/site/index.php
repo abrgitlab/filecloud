@@ -16,24 +16,12 @@ AppAsset::register($this);
     <?= FileUploadUI::widget([
         'model' => $model,
         'attribute' => 'file',
-        'url' => ['media/upload', 'id' => $model->id],
-        'gallery' => false,
+        'url' => ['file/upload', 'id' => $model->id],
         'fieldOptions' => [
             'accept' => '*/*'
         ],
         'clientOptions' => [
-            'maxFileSize' => 20000000
-        ],
-        // ...
-        'clientEvents' => [
-            'fileuploaddone' => 'function(e, data) {
-                                    console.log(e);
-                                    console.log(data);
-                                }',
-            'fileuploadfail' => 'function(e, data) {
-                                    console.log(e);
-                                    console.log(data);
-                                }',
+            'maxChunkSize' => 500000,
         ],
     ]);
     ?>

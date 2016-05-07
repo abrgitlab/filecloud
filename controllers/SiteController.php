@@ -29,14 +29,14 @@ class SiteController extends Controller
 
     public function actionFileUpload()
     {
-        $file = new Files();
-        return $file->uploadFile();
+        return Files::uploadFile();
     }
 
     public function actionGet($shortlink) {
-        $file = Files::findOne(['shortlink' => $shortlink]);
-        if ($file) {
-            Yii::$app->response->sendFile(Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR . $file->shortlink, $file->title);
+        $file = Files::findOne(['shortlink' => $shortlink, 'loading_state' => Files::LOADING_STATE_LOADED]);
+        $path = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR . $file->shortlink;
+        if ($file && file_exists($path)) {
+            Yii::$app->response->sendFile($path, $file->title);
         } else {
             throw new NotFoundHttpException();
         }

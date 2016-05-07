@@ -13,6 +13,8 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\Cookie;
+use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -21,10 +23,29 @@ use yii\web\UploadedFile;
  * @property integer $id
  * @property string $title
  * @property string $shortlink
+ * @property integer $loading_state
  * @property integer $uploaded_at
  */
+
+//TODO: разобратся с uploaded_at
+
 class Files extends ActiveRecord
 {
+
+    /**
+     * Статус загрузки "в процессе"
+     */
+    const LOADING_STATE_IN_PROCESS = 0;
+
+    /**
+     * Статус загрузки "загружен"
+     */
+    const LOADING_STATE_LOADED = 1;
+
+    /**
+     * @var string $upload_directory
+     */
+    public $upload_directory;
 
     /**
      * @inheritdoc
@@ -34,21 +55,15 @@ class Files extends ActiveRecord
         return 'files';
     }
 
-//    private function generateLink($id) {
-//        $result = '';
-//
-//        $steps = 3 - ((strlen($id) - 1) % 3 + 1);
-//        for ($i = 0; $i < $steps; ++$i) {
-//            while (($rand = rand(0, 255)) >= 48 && $rand <= 57 ); //Избавляемся от ASCII-диапазона 30-39 (цифры), дабы избежать дубляжа коротких ссылок
-//            $result .= chr($rand);
-//        }
-//
-//        for ($i = 0; $i < strlen($id); ++$i) {
-//            $result .= chr(substr($id, $i, 1));
-//        }
-//
-//        return base64_encode($result);
-//    }
+    function init()
+    {
+        parent::init();
+
+        $this->upload_directory = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR;
+        if (!is_dir($this->upload_directory)) {
+            mkdir($this->upload_directory);
+        }
+    }
 
     /**
      * Генерирует короткую ссылку на файл
@@ -86,37 +101,100 @@ class Files extends ActiveRecord
      * @return string
      * @throws \Exception
      */
-    public function uploadFile() {
-        $file = UploadedFile::getInstanceByName('FileLoader[file]');
-        $directory = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR;
-        if (!is_dir($directory)) {
-            mkdir($directory);
+    public static function uploadFile() {
+        $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]');
+        $content_range = Yii::$app->request->headers->get('content-range');
+
+        if ($tmp_file) {
+            $response = [];
+
+            if ($content_range) {
+                $content_range = preg_split('/[^0-9]+/', $content_range);
+                $range_start = $content_range[1];
+                $range_end = $content_range[2];
+                $full_size = $content_range[3];
+
+                if ($range_start == 0) {
+                    $file_model = new Files();
+                    $file_model->title = $tmp_file->name;
+                    $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
+                    $file_model->save();
+
+                    do {
+                        $file_model->shortlink = $file_model->generateLink($file_model->id);
+                    } while (strpos($file_model->shortlink, '/') || strpos($file_model->shortlink, '+'));
+                    $file_model->save();
+
+                    Yii::$app->response->cookies->add(new Cookie([
+                        'name' => 'shortlink',
+                        'value' => $file_model->shortlink,
+                    ]));
+
+                    $filePath = $file_model->upload_directory . $file_model->shortlink;
+                    if (!$tmp_file->saveAs($filePath)) {
+                        throw new ServerErrorHttpException('I can\'t create new file');
+                    }
+                } elseif ($cookie_shortlink = Yii::$app->request->cookies->get('shortlink')) {
+                    $file_model = Files::findOne(['shortlink' => $cookie_shortlink, 'loading_state' => Files::LOADING_STATE_IN_PROCESS]);
+                    if ($file_model) {
+                        if ($range_end + 1 == $full_size) {
+                            Yii::$app->response->cookies->remove('shortlink');
+                            $file_model->loading_state = Files::LOADING_STATE_LOADED;
+                            $file_model->save();
+
+                            $response = [
+                                'files' => [[
+                                    'name' => $file_model->title,
+                                    'size' => $full_size,
+                                    'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                                ]]
+                            ];
+                        } elseif ($range_end + 1 > $full_size) {
+                            throw new ServerErrorHttpException('Chunk range ends after full file size');
+                        }
+
+                        $filePath = $file_model->upload_directory . $file_model->shortlink;
+                        file_put_contents(
+                            $filePath,
+                            fopen($tmp_file->tempName, 'r'),
+                            FILE_APPEND
+                        );
+                        $tmp_file->reset();
+                    } else {
+                        throw new ServerErrorHttpException('Loading file not found');
+                    }
+                } else {
+                    throw new ServerErrorHttpException('I can\'t tie this chunk to any file');
+                }
+            } else {
+                $file_model = new Files();
+                $file_model->title = $tmp_file->name;
+                $file_model->loading_state = Files::LOADING_STATE_LOADED;
+                $file_model->save();
+
+                do {
+                    $file_model->shortlink = $file_model->generateLink($file_model->id);
+                } while (strpos($file_model->shortlink, '/') || strpos($file_model->shortlink, '+'));
+                $file_model->save();
+
+                $filePath = $file_model->upload_directory . $file_model->shortlink;
+                if ($tmp_file->saveAs($filePath)) {
+                    $response = [
+                        'files' => [[
+                            'name' => $file_model->title,
+                            'size' => $tmp_file->size,
+                            'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                        ]]
+                    ];
+                } else {
+                    throw new ServerErrorHttpException('I can\'t create new file');
+                }
+            }
+
+            return Json::encode($response);
         }
 
-        if ($file) {
-            $this->title = $file->name;
-            $this->uploaded_at = time();
-            $this->save();
-
-            do {
-                $this->shortlink = $this->generateLink($this->id);
-            } while (strpos($this->shortlink, '/') || strpos($this->shortlink, '+'));
-            $this->save();
-
-            $filePath = $directory . $this->shortlink;
-            if ($file->saveAs($filePath)) {
-                $path = Url::to(['site/get', 'shortlink' => $this->shortlink]);
-                return Json::encode([
-                    'files' => [[
-                        'name' => $this->title,
-                        'size' => $file->size,
-                        'url' => $path,
-                    ]]
-                ]);
-            } else
-                $this->delete();
-        }
-        return Json::encode([]);
+        throw new ServerErrorHttpException('Error while uploading file');
     }
 
 }
