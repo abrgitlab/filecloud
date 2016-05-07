@@ -15,9 +15,20 @@ use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
 
+/**
+ * This is the model class for table "files".
+ *
+ * @property integer $id
+ * @property string $title
+ * @property string $shortlink
+ * @property integer $uploaded_at
+ */
 class Files extends ActiveRecord
 {
 
+    /**
+     * @inheritdoc
+     */
     public static function tableName()
     {
         return 'files';
@@ -39,6 +50,12 @@ class Files extends ActiveRecord
 //        return base64_encode($result);
 //    }
 
+    /**
+     * Генерирует короткую ссылку на файл
+     *
+     * @param int|string $id
+     * @return string
+     */
     private function generateLink($id) {
         $result = '';
 
@@ -65,8 +82,11 @@ class Files extends ActiveRecord
         return base64_encode($result);
     }
 
-    public function uploadFile()
-    {
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function uploadFile() {
         $file = UploadedFile::getInstanceByName('FileLoader[file]');
         $directory = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR;
         if (!is_dir($directory)) {
@@ -78,7 +98,7 @@ class Files extends ActiveRecord
             $this->uploaded_at = time();
             $this->save();
 
-            {
+            do {
                 $this->shortlink = $this->generateLink($this->id);
             } while (strpos($this->shortlink, '/') || strpos($this->shortlink, '+'));
             $this->save();
@@ -96,6 +116,7 @@ class Files extends ActiveRecord
             } else
                 $this->delete();
         }
-        return [];
+        return Json::encode([]);
     }
+
 }

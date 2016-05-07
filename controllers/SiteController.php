@@ -6,6 +6,7 @@ use app\models\FileLoader;
 use Yii;
 use yii\web\Controller;
 use app\models\Files;
+use yii\web\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -33,7 +34,12 @@ class SiteController extends Controller
     }
 
     public function actionGet($shortlink) {
-
+        $file = Files::findOne(['shortlink' => $shortlink]);
+        if ($file) {
+            Yii::$app->response->sendFile(Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR . $file->shortlink, $file->title);
+        } else {
+            throw new NotFoundHttpException();
+        }
     }
 
 }
