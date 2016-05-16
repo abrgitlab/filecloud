@@ -11,6 +11,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\Cookie;
@@ -104,6 +105,10 @@ class Files extends ActiveRecord
     public static function uploadFile() {
         $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]');
         $content_range = Yii::$app->request->headers->get('content-range');
+        preg_match('/attachment; filename="([^"]+)"/', Yii::$app->request->headers->get('content-disposition'), $content_disposition_result);
+        $content_disposition = NULL;
+        if (isset($content_disposition_result[1]))
+            $content_disposition = $content_disposition_result[1];
 
         if ($tmp_file) {
             $response = [];
@@ -125,20 +130,24 @@ class Files extends ActiveRecord
                     } while (strpos($file_model->shortlink, '/') || strpos($file_model->shortlink, '+'));
                     $file_model->save();
 
-                    Yii::$app->response->cookies->add(new Cookie([
-                        'name' => 'shortlink',
-                        'value' => $file_model->shortlink,
-                    ]));
+                    if (isset(Yii::$app->session->get('files')[$content_disposition])) {
+                        $new_files = Yii::$app->session->get('files');
+                        unset($new_files[$content_disposition]);
+                        Yii::$app->session->set('files', $new_files);
+                    }
+                    Yii::$app->session->set('files', ArrayHelper::merge(Yii::$app->session->get('files'), [$content_disposition => $file_model->shortlink]));
 
                     $filePath = $file_model->upload_directory . $file_model->shortlink;
                     if (!$tmp_file->saveAs($filePath)) {
                         throw new ServerErrorHttpException('I can\'t create new file');
                     }
-                } elseif ($cookie_shortlink = Yii::$app->request->cookies->get('shortlink')) {
-                    $file_model = Files::findOne(['shortlink' => $cookie_shortlink, 'loading_state' => Files::LOADING_STATE_IN_PROCESS]);
+                } elseif ($content_disposition && isset(Yii::$app->session->get('files')[$content_disposition]) && $shortlink = Yii::$app->session->get('files')[$content_disposition]) {
+                    $file_model = Files::findOne(['shortlink' => $shortlink, 'loading_state' => Files::LOADING_STATE_IN_PROCESS]);
                     if ($file_model) {
                         if ($range_end + 1 == $full_size) {
-                            Yii::$app->response->cookies->remove('shortlink');
+                            $new_files = Yii::$app->session->get('files');
+                            unset($new_files[$content_disposition]);
+                            Yii::$app->session->set('files', $new_files);
                             $file_model->loading_state = Files::LOADING_STATE_LOADED;
                             $file_model->save();
 

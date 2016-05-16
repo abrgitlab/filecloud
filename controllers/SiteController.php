@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\FileLoader;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use app\models\Files;
 use yii\web\NotFoundHttpException;
@@ -11,8 +12,7 @@ use yii\web\NotFoundHttpException;
 class SiteController extends Controller
 {
 
-    public function actions()
-    {
+    public function actions() {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
@@ -20,15 +20,13 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex() {
         return $this->render('index', [
             'model' => new FileLoader()
         ]);
     }
 
-    public function actionFileUpload()
-    {
+    public function actionFileUpload() {
         return Files::uploadFile();
     }
 
