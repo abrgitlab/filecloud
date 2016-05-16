@@ -3,7 +3,10 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use app\assets\AppAsset;
 use yii\helpers\Html;
+
+AppAsset::register($this);
 
 ?>
 <?php $this->beginPage() ?>
@@ -19,7 +22,9 @@ use yii\helpers\Html;
 <body>
 <?php $this->beginBody() ?>
 
-<?= $content ?>
+<div class="container">
+    <?= $content ?>
+</div>
 
 <?php $this->endBody() ?>
 </body>

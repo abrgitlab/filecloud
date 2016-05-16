@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\models\FileLoader;
+use app\models\LoginForm;
 use Yii;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use app\models\Files;
@@ -12,12 +14,53 @@ use yii\web\NotFoundHttpException;
 class SiteController extends Controller
 {
 
+    public function behaviors() {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'except' => ['get', 'error'],
+                'rules' => [
+                    [
+                        'actions' => ['login'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'actions' => ['index', 'file-upload', 'logout'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ]
+        ];
+    }
+
     public function actions() {
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
         ];
+    }
+
+    public function actionLogin() {
+        if (!\Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new LoginForm();
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->goBack();
+        }
+        return $this->render('login', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionLogout() {
+        Yii::$app->user->logout();
+
+        return $this->goHome();
     }
 
     public function actionIndex() {

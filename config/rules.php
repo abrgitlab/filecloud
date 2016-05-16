@@ -8,5 +8,7 @@
 
 return [
     'file/upload' => 'site/file-upload',
-    'file/get/<shortlink:[a-zA-Z/+]+>' => 'site/get',
+    'file/get/<shortlink:[a-zA-Z]+>' => 'site/get',
+    'login' => 'site/login',
+    'logout' => 'site/logout',
 ];

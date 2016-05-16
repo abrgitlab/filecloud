@@ -14,7 +14,6 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
-use yii\web\Cookie;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 
