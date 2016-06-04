@@ -1,12 +1,13 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $model app\models\FileLoader */
+/* @var $this View */
+/* @var $model FileLoader */
 
+use app\models\FileLoader;
 use dosamigos\fileupload\FileUploadUI;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-use yii\helpers\Html;
+use yii\web\View;
 
 $this->title = Yii::$app->params['productName'];
 

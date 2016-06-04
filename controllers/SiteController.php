@@ -26,7 +26,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['index', 'file-upload', 'logout'],
+                        'actions' => ['index', 'file-upload', 'uploads', 'logout'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -70,7 +70,7 @@ class SiteController extends Controller
     }
 
     public function actionUploads() {
-
+        return $this->render('uploads');
     }
 
     public function actionFileUpload() {
