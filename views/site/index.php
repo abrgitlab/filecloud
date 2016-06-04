@@ -9,6 +9,7 @@ $this->title = 'Abr Daemon file cloud';
 
 ?>
 
+<div class="row">
 <?= FileUploadUI::widget([
     'model' => $model,
     'attribute' => 'file',
@@ -22,3 +23,4 @@ $this->title = 'Abr Daemon file cloud';
     ],
 ]);
 ?>
+</div>

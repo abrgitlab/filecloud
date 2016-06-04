@@ -8,6 +8,7 @@
 
 namespace app\commands;
 
+use app\models\Users;
 use Yii;
 use yii\console\Controller;
 
@@ -20,6 +21,22 @@ class RbacController extends Controller
         if (!($common_user = $auth->getRole('commonUser'))) {
             $common_user = $auth->createRole('commonUser');
             $auth->add($common_user);
+        }
+
+        $user_1 = Users::findOne(['email' => 'abr_mail@mail.ru']);
+
+        if (!$user_1) {
+            $user_1 = new Users();
+            $user_1->login = 'abr_filecloud';
+            $user_1->email = 'abr_mail@mail.ru';
+            $user_1->password = '82bedeb2bd324a1c45a25a7626f9518c';
+            $user_1->first_name = 'Дмитрий';
+            $user_1->last_name = 'Малахов';
+            $user_1->active = 1;
+
+            $user_1->save();
+
+            $auth->assign($common_user, $user_1->id);
         }
     }
 

@@ -25,6 +25,7 @@ use yii\web\UploadedFile;
  * @property string $shortlink
  * @property integer $loading_state
  * @property integer $uploaded_at
+ * @property integer $user_id
  */
 
 //TODO: разобратся с uploaded_at
@@ -122,6 +123,7 @@ class Files extends ActiveRecord
                     $file_model = new Files();
                     $file_model->title = $tmp_file->name;
                     $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
+                    $file_model->user_id = Yii::$app->user->getId();
                     $file_model->save();
 
                     do {
@@ -178,6 +180,7 @@ class Files extends ActiveRecord
                 $file_model = new Files();
                 $file_model->title = $tmp_file->name;
                 $file_model->loading_state = Files::LOADING_STATE_LOADED;
+                $file_model->user_id = Yii::$app->user->getId();
                 $file_model->save();
 
                 do {

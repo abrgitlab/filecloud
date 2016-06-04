@@ -11,4 +11,5 @@ return [
     'file/get/<shortlink:[a-zA-Z]+>' => 'site/get',
     'login' => 'site/login',
     'logout' => 'site/logout',
+//    'test' => 'site/test',
 ];

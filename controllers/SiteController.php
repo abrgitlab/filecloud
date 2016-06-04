@@ -18,7 +18,7 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => ['get', 'error'],
+                'except' => ['get', 'error'/*, 'test'*/],
                 'rules' => [
                     [
                         'actions' => ['login'],
@@ -82,5 +82,9 @@ class SiteController extends Controller
             throw new NotFoundHttpException();
         }
     }
+
+//    public function actionTest() {
+//        var_dump(Yii::$app->user->getId());die;
+//    }
 
 }
