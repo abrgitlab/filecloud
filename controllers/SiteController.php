@@ -69,6 +69,10 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionUploads() {
+
+    }
+
     public function actionFileUpload() {
         return Files::uploadFile();
     }
