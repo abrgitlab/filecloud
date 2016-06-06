@@ -4,12 +4,13 @@ namespace app\controllers;
 
 use app\models\FileLoader;
 use app\models\LoginForm;
+use app\models\Users;
 use Yii;
 use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use app\models\Files;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 class SiteController extends Controller
 {
@@ -44,7 +45,7 @@ class SiteController extends Controller
     }
 
     public function actionLogin() {
-        if (!\Yii::$app->user->isGuest) {
+        if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 

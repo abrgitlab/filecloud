@@ -12,5 +12,7 @@ return [
     'uploads' => 'site/uploads',
     'login' => 'site/login',
     'logout' => 'site/logout',
+
+    'app/login' => 'mobile/login',
 //    'test' => 'site/test',
 ];
