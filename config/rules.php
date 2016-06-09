@@ -13,6 +13,6 @@ return [
     'login' => 'site/login',
     'logout' => 'site/logout',
 
-    'app/login' => 'mobile/login',
+    'api/login' => 'api/login',
 //    'test' => 'site/test',
 ];
