@@ -5,8 +5,7 @@ use yii\db\Schema;
 
 class m160506_194907_filecloud extends Migration
 {
-    public function up()
-    {
+    public function up() {
         $tableOptions = null;
         $this->createTable('{{%files}}', [
             'id' => $this->primaryKey(),
@@ -17,20 +16,9 @@ class m160506_194907_filecloud extends Migration
         ], $tableOptions);
     }
 
-    public function down()
-    {
+    public function down() {
         $this->dropTable('{{%files}}');
         return true;
     }
 
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

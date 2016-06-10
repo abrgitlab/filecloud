@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\JWT;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -16,6 +17,8 @@ use yii\web\IdentityInterface;
  * @property string $first_name
  * @property string $last_name
  * @property integer $active
+ * @property string $tokens_valid_after
+ * @property string $secret
  *
  * @property Files[] $files
  */
@@ -24,16 +27,14 @@ class Users extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'users';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['login', 'email', 'password', 'first_name', 'last_name'], 'required'],
             [['login', 'email', 'first_name', 'last_name'], 'string'],
@@ -45,8 +46,7 @@ class Users extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'login' => 'Login',
@@ -69,8 +69,7 @@ class Users extends ActiveRecord implements IdentityInterface
      * Null should be returned if such an identity cannot be found
      * or the identity is not in an active state (disabled, deleted, etc.)
      */
-    public static function findIdentity($id)
-    {
+    public static function findIdentity($id) {
         return self::find()->where(['id' => $id])->one();
     }
 
@@ -83,8 +82,34 @@ class Users extends ActiveRecord implements IdentityInterface
      * Null should be returned if such an identity cannot be found
      * or the identity is not in an active state (disabled, deleted, etc.)
      */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
+    public static function findIdentityByAccessToken($token, $type = null) {
+        $jwt = new JWT();
+        if($jwt->decode($token, ['HS256'])) {
+            $payload = $jwt->payload;
+
+            if (!isset($payload->jti))
+                return null;
+
+            $identity = self::find()->where(['id' => $payload->jti])->one();
+            if (!$jwt->verify($identity['secret'], 'HS256'))
+                return null;
+
+            return $identity;
+        }
+
+        return null;
+
+//        $tks = explode('.', $token);
+//        list($headb64, $bodyb64, $cryptob64) = $tks;
+//        $payload = JWT::jsonDecode(JWT::urlsafeB64Decode($bodyb64));
+//
+//        if (!$payload->jti)
+//            return null;
+//
+//        $identity = self::find()->where(['id' => $payload->jti])->one();
+//        JWT::decode($token, $identity->secret, 'HS256');
+//        var_dump($identity);die;
+//        $payload['jti'];
         // TODO: Implement findIdentityByAccessToken() method.
     }
 
@@ -92,8 +117,7 @@ class Users extends ActiveRecord implements IdentityInterface
      * Returns an ID that can uniquely identify a user identity.
      * @return string|integer an ID that uniquely identifies a user identity.
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
@@ -109,9 +133,15 @@ class Users extends ActiveRecord implements IdentityInterface
      * @return string a key that is used to check the validity of a given identity ID.
      * @see validateAuthKey()
      */
-    public function getAuthKey()
-    {
-        // TODO: Implement getAuthKey() method.
+    public function getAuthKey() {
+        $token = array(
+            'iat' => time(),
+            'jti' => $this->getId()
+        );
+
+        $jwt = new JWT();
+        $jwt->encode($token, $this->secret, 'HS256');
+        return $jwt->token;
     }
 
     /**
@@ -122,9 +152,8 @@ class Users extends ActiveRecord implements IdentityInterface
      * @return boolean whether the given auth key is valid.
      * @see getAuthKey()
      */
-    public function validateAuthKey($authKey)
-    {
-        // TODO: Implement validateAuthKey() method.
+    public function validateAuthKey($authKey) {
+        return $this->authKey === $authKey;
     }
 
     /**
@@ -133,8 +162,7 @@ class Users extends ActiveRecord implements IdentityInterface
      * @param  string  $password password to validate
      * @return boolean if password provided is valid for current user
      */
-    public function validatePassword($password)
-    {
+    public function validatePassword($password) {
         return $this->password === $password;
     }
 

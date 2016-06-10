@@ -40,32 +40,14 @@ class ApiController extends Controller {
                     'allow' => true,
                     'roles' => ['?'],
                 ],
-//                [
-//                    'actions' => ['index', 'file-upload', 'uploads', 'logout'],
-//                    'allow' => true,
-//                    'roles' => ['@'],
-//                ],
+                [
+                    'actions' => [/*'file-upload', */'uploads'],
+                    'allow' => true,
+                    'roles' => ['@'],
+                ],
             ],
         ];
         return $behaviors;
-//        return [
-//            'access' => [
-//                'class' => AccessControl::className(),
-//                'except' => ['get', 'error'/*, 'test'*/],
-//                'rules' => [
-//                    [
-//                        'actions' => ['login'],
-//                        'allow' => true,
-//                        'roles' => ['?'],
-//                    ],
-//                    [
-//                        'actions' => ['index', 'file-upload', 'uploads', 'logout'],
-//                        'allow' => true,
-//                        'roles' => ['@'],
-//                    ],
-//                ],
-//            ]
-//        ];
     }
 
     public function init() {
@@ -89,6 +71,10 @@ class ApiController extends Controller {
             $model->validate();
             return $model;
         }
+    }
+
+    public function actionUploads() {
+        return 111;
     }
 
 }

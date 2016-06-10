@@ -4,8 +4,7 @@ use yii\db\Migration;
 
 class m160516_105113_users extends Migration
 {
-    public function up()
-    {
+    public function up() {
         $tableOptions = null;
         $this->createTable('{{%users}}', [
             'id' => $this->primaryKey(),
@@ -21,23 +20,11 @@ class m160516_105113_users extends Migration
         $this->addForeignKey('{{%fk_files_users}}', '{{%files}}', 'user_id', '{{%users}}', 'id');
     }
 
-    public function down()
-    {
+    public function down() {
         $this->dropForeignKey('{{%fk_files_users}}', '{{%files}}');
         $this->dropColumn('{{%files}}', 'user_id');
         $this->dropTable('{{%users}}');
 
         return true;
     }
-
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

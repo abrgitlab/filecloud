@@ -14,5 +14,6 @@ return [
     'logout' => 'site/logout',
 
     'api/login' => 'api/login',
+    'api/uploads' => 'api/uploads',
 //    'test' => 'site/test',
 ];
