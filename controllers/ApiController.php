@@ -65,7 +65,8 @@ class ApiController extends Controller {
 
     public function actionLogin() {
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->get(), '') && $model->login()) {
+        $model->load(Yii::$app->request->post(), '');
+        if ($model->load(Yii::$app->request->post(), '') && $model->login()) {
             return ['access_token' => Yii::$app->user->identity->getAuthKey()];
         } else {
             $model->validate();
