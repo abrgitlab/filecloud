@@ -70,8 +70,49 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionUploads() {
-        return $this->render('uploads');
+    public function actionUploads($filter = 'all') {
+        $this->layout = 'uploads';
+
+        $this->view->params['filter'] = $filter;
+        $this->view->params['menu_items'] = [
+            [
+                'alias' => 'all',
+                'title' => Yii::t('app', 'All'),
+                'icon' => '',
+            ],
+            [
+                'alias' => 'docs',
+                'title' => Yii::t('app', 'Documents'),
+                'icon' => ''
+            ],
+            [
+                'alias' => 'pics',
+                'title' => Yii::t('app', 'Pictures'),
+                'icon' => ''
+            ],
+            [
+                'alias' => 'audio',
+                'title' => Yii::t('app', 'Audio'),
+                'icon' => ''
+            ],
+            [
+                'alias' => 'video',
+                'title' => Yii::t('app', 'Video'),
+                'icon' => ''
+            ],
+            [
+                'alias' => 'downloads',
+                'title' => Yii::t('app', 'Downloads'),
+                'icon' => ''
+            ],
+            [
+                'alias' => 'other',
+                'title' => Yii::t('app', 'Other'),
+                'icon' => ''
+            ],
+        ];
+
+        return $this->render("uploads/$filter");
     }
 
     public function actionFileUpload() {
@@ -91,5 +132,12 @@ class SiteController extends Controller
 //    public function actionTest() {
 //        var_dump(Yii::$app->user->getId());die;
 //    }
+
+    public function render($view, $params = []) {
+        if ($this->layout == null || $this->layout == 'main' || $this->layout == 'uploads')
+            $this->view->params['navbar'] = $this->renderPartial('navbar');
+
+        return parent::render($view, $params);
+    }
 
 }

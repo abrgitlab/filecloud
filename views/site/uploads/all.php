@@ -1,10 +1,11 @@
 <?php
-use yii\web\View;
 /**
  * Created by PHPStorm.
  * User: daemon
- * Date: 04.06.16
- * Time: 23:23
+ * Date: 13.06.16
+ * Time: 0:13
  */
 
 /* @var $this View */
+
+use yii\web\View;

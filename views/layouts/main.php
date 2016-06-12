@@ -4,6 +4,8 @@
 /* @var $content string */
 
 use app\assets\AppAsset;
+use yii\bootstrap\Nav;
+use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\web\View;
 
@@ -23,6 +25,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
+<?= $this->params['navbar'] ?>
 <?= $content ?>
 
 <?php $this->endBody() ?>

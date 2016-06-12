@@ -1,0 +1,46 @@
+.sidebar {
+    margin: 20px 0;
+}
+
+.sidebar-menu {
+    padding: 20px 0 10px 0;
+}
+
+.sidebar-menu ul li {
+    border-bottom: 1px solid #f0f4f7;
+}
+
+.sidebar-menu ul li:last-child {
+    border-bottom: none;
+}
+
+.sidebar-menu ul li a {
+    color: #93a3b5;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.sidebar-menu ul li a i {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.sidebar-menu ul li a:hover {
+    background-color: #fafcfd;
+    color: #5b9bd1;
+}
+
+.sidebar-menu ul li.active {
+    border-bottom: none;
+}
+
+.sidebar-menu ul li.active a {
+    color: #5b9bd1;
+    background-color: #f6f9fb;
+    border-left: 2px solid #5b9bd1;
+    margin-left: -2px;
+}
+
+.admin-content {
+    padding: 20px;
+}
