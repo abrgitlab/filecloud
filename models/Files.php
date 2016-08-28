@@ -208,4 +208,9 @@ class Files extends ActiveRecord
         throw new ServerErrorHttpException('Error while uploading file');
     }
 
+    public function delete() {
+        unlink($this->upload_directory . $this->shortlink);
+        return parent::delete();
+    }
+
 }

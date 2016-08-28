@@ -6,7 +6,9 @@ use app\models\FileLoader;
 use app\models\LoginForm;
 use app\models\Users;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use app\models\Files;
 use yii\web\NotFoundHttpException;
@@ -27,12 +29,18 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['index', 'file-upload', 'uploads', 'logout'],
+                        'actions' => ['index', 'file-upload', 'uploads', 'uploads-delete', 'logout'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
-            ]
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'uploads-delete' => ['POST'],
+                ],
+            ],
         ];
     }
 
@@ -106,13 +114,25 @@ class SiteController extends Controller
                 'icon' => ''
             ],
             [
+                'alias' => 'downloads',
+                'title' => Yii::t('app', 'Archives'),
+                'icon' => '',
+            ],
+            [
                 'alias' => 'other',
                 'title' => Yii::t('app', 'Other'),
                 'icon' => ''
             ],
         ];
 
-        return $this->render("uploads/$filter");
+        $files = new Files();
+        $dataProvider = new ActiveDataProvider([
+            'query' => Files::find()->where(['user_id' => Yii::$app->user->id]),
+        ]);
+
+        return $this->render("uploads/$filter", [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     public function actionFileUpload() {
@@ -126,6 +146,51 @@ class SiteController extends Controller
             Yii::$app->response->sendFile($path, $file->title);
         } else {
             throw new NotFoundHttpException();
+        }
+    }
+
+    /**
+     * Updates an existing Files model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id) {
+        $model = $this->findModel($id);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Deletes an existing Files model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUploadsDelete($id)
+    {
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['site/uploads']);
+    }
+
+    /**
+     * Finds the Files model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Files the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id) {
+        if (($model = Files::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 

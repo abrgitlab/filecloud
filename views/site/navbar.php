@@ -19,7 +19,9 @@ NavBar::begin([
 echo Nav::widget([
     'options' => ['class' => 'navbar-nav navbar-right'],
     'items' => [
-        ['label' => 'Мои загрузки', 'url' => ['site/uploads']],
+        !Yii::$app->user->isGuest ? (
+        ['label' => Yii::t('app', 'My uploads'), 'url' => ['site/uploads']]
+        ) : '',
         Yii::$app->user->isGuest ? (
         ['label' => 'Login', 'url' => ['/site/login']]
         ) : (

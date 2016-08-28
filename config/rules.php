@@ -8,8 +8,9 @@
 
 return [
     'file/upload' => 'site/file-upload',
-    'file/get/<shortlink:[a-zA-Z]+>' => 'site/get',
+    'file/get/<shortlink:[a-zA-Z0-9]+>' => 'site/get',
     'uploads/<filter:[a-zA-Z]+>' => 'site/uploads',
+    'uploads/delete/<id:[0-9]+>' => 'site/uploads-delete',
     'uploads' => 'site/uploads',
     'login' => 'site/login',
     'logout' => 'site/logout',
