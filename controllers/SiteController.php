@@ -125,7 +125,7 @@ class SiteController extends Controller
             ],
         ];
 
-        $files = new Files();
+//        $files = new Files();
         $dataProvider = new ActiveDataProvider([
             'query' => Files::find()->where(['user_id' => Yii::$app->user->id]),
         ]);
