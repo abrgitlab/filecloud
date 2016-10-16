@@ -15,9 +15,10 @@ return [
     'login' => 'site/login',
     'logout' => 'site/logout',
 
-    'api/login' => 'api/login',
+    'api/file/upload' => 'api/file-upload',
 //    'api/uploads/<filter:[a-zA-Z]+>' => 'api/uploads',
     'api/uploads' => 'api/uploads',
+    'api/login' => 'api/login',
 
 //    'test' => 'site/test',
 ];

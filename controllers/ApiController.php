@@ -9,6 +9,7 @@
 namespace app\controllers;
 
 
+use app\models\Files;
 use app\models\LoginForm;
 use Yii;
 use yii\filters\AccessControl;
@@ -72,6 +73,10 @@ class ApiController extends Controller {
             $model->validate();
             return $model;
         }
+    }
+
+    public function actionFileUpload() {
+        return Files::uploadFile();
     }
 
     public function actionUploads() {
