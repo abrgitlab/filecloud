@@ -42,7 +42,7 @@ class ApiController extends Controller {
                     'roles' => ['?'],
                 ],
                 [
-                    'actions' => [/*'file-upload', */'uploads'],
+                    'actions' => ['file-upload', 'uploads'],
                     'allow' => true,
                     'roles' => ['@'],
                 ],

@@ -10,6 +10,7 @@ namespace app\commands;
 
 use app\models\Users;
 use Yii;
+use yii\base\Security;
 use yii\console\Controller;
 
 class RbacController extends Controller
@@ -32,6 +33,7 @@ class RbacController extends Controller
             $user_1->password = '82bedeb2bd324a1c45a25a7626f9518c';
             $user_1->first_name = 'Дмитрий';
             $user_1->last_name = 'Малахов';
+            $user_1->secret = Yii::$app->getSecurity()->generateRandomString(16);
             $user_1->active = 1;
 
             $user_1->save();

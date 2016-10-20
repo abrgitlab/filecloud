@@ -136,6 +136,7 @@ class SiteController extends Controller
     }
 
     public function actionFileUpload() {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         return Files::uploadFile();
     }
 

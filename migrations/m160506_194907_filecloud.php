@@ -11,6 +11,8 @@ class m160506_194907_filecloud extends Migration
             'id' => $this->primaryKey(),
             'title' => $this->text()->notNull(),
             'shortlink' => $this->text()->notNull(),
+            'size' => $this->integer(),
+            'chunks' => $this->string()->notNull()->defaultValue('[]'),
             'loading_state' => $this->smallInteger()->notNull(),
             'uploaded_at' => $this->timestamp()->notNull(),
         ], $tableOptions);

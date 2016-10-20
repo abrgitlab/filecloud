@@ -10,10 +10,10 @@ class m160609_201507_oauth2 extends Migration
     }
 
     public function down() {
-        $this->dropColumn('{{%files}}', 'tokens_valid_after');
-        $this->dropColumn('{{%files}}', 'secret');
+        $this->dropColumn('{{%users}}', 'tokens_valid_after');
+        $this->dropColumn('{{%users}}', 'secret');
 
-        return false;
+        return true;
     }
 
 }
