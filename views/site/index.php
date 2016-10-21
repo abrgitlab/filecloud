@@ -7,7 +7,7 @@ use app\models\FileLoader;
 use dosamigos\fileupload\FileUploadUI;
 use yii\web\View;
 
-$this->title = Yii::$app->params['productName'];
+$this->title = Yii::t('app', Yii::$app->params['productName']);
 
 ?>
 

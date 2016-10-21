@@ -125,7 +125,6 @@ class SiteController extends Controller
             ],
         ];
 
-//        $files = new Files();
         $dataProvider = new ActiveDataProvider([
             'query' => Files::find()->where(['user_id' => Yii::$app->user->id]),
         ]);
@@ -142,12 +141,14 @@ class SiteController extends Controller
 
     public function actionGet($shortlink) {
         $file = Files::findOne(['shortlink' => $shortlink, 'loading_state' => Files::LOADING_STATE_LOADED]);
-        $path = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR . $file->shortlink;
-        if ($file && file_exists($path)) {
-            Yii::$app->response->sendFile($path, $file->title);
-        } else {
-            throw new NotFoundHttpException();
+        if ($file) {
+            $path = Yii::getAlias('@webroot/media') . DIRECTORY_SEPARATOR . $file->shortlink;
+            if (file_exists($path)) {
+                Yii::$app->response->sendFile($path, $file->title);
+                return;
+            }
         }
+        throw new NotFoundHttpException();
     }
 
     /**
