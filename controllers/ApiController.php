@@ -79,8 +79,8 @@ class ApiController extends Controller {
         return Files::uploadFile();
     }
 
-    public function actionUploads() {
-        return 111;
+    public function actionUploads($filter = 'all') {
+        return Files::find()->select(['title', 'shortlink', 'size', 'loading_state', 'uploaded_at'])->where(['user_id' => Yii::$app->user->id])->all();
     }
 
 }

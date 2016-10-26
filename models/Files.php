@@ -29,8 +29,6 @@ use yii\web\UploadedFile;
  * @property integer $user_id
  */
 
-//TODO: разобратся с uploaded_at
-
 class Files extends ActiveRecord
 {
 
