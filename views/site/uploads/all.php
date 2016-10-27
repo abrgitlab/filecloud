@@ -9,6 +9,7 @@
 /* @var $this View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Files;
 use yii\grid\DataColumn;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -24,9 +25,13 @@ echo GridView::widget([
             'attribute' => 'title',
             'format' => 'ntext',
             'content' => function($model, $key, $index, $column) {
-                return Html::a($model->title, ['site/get', 'shortlink' => $model->shortlink]);
+                if ($model->loading_state == Files::LOADING_STATE_IN_PROCESS)
+                    return $model->title;
+                else
+                    return Html::a($model->title, ['site/get', 'shortlink' => $model->shortlink]);
             }
         ],
+        'size',
         'uploaded_at:datetime',
 
         [
