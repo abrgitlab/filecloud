@@ -102,7 +102,7 @@ class Files extends ActiveRecord
      * @throws \Exception
      */
     public static function uploadFile() {
-        $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]');
+        $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]'); //TODO: выяснить, можно ли передавать несколько файлов за один запрос и что можно с етим делать
 
         $content_range = Yii::$app->request->headers->get('content-range');
         preg_match('/attachment; filename="([^"]+)"/', Yii::$app->request->headers->get('content-disposition'), $content_disposition_result);
@@ -154,6 +154,7 @@ class Files extends ActiveRecord
                                 'name' => $file_model->title,
                                 'size' => $full_size,
                                 'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                                'shortlink' => $file_model->shortlink,
                             ]]
                         ];
                     }
@@ -182,6 +183,7 @@ class Files extends ActiveRecord
                             'name' => $file_model->title,
                             'size' => $tmp_file->size,
                             'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                            'shortlink' => $file_model->shortlink,
                         ]]
                     ];
                 } else {

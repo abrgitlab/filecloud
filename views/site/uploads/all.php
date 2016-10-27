@@ -31,6 +31,7 @@ echo GridView::widget([
                     return Html::a($model->title, ['site/get', 'shortlink' => $model->shortlink]);
             }
         ],
+        'size',
         'uploaded_at:datetime',
 
         [
