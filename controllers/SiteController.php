@@ -29,7 +29,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['index', 'file-upload', 'uploads', 'uploads-delete', 'logout'],
+                        'actions' => ['index', 'file-upload', 'file-upload2', 'uploads', 'uploads-delete', 'logout'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -137,6 +137,11 @@ class SiteController extends Controller
     public function actionFileUpload() {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Files::uploadFile();
+    }
+
+    public function actionFileUpload2() {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return Files::uploadFile2();
     }
 
     public function actionGet($shortlink) {

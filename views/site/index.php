@@ -26,3 +26,14 @@ $this->title = Yii::t('app', Yii::$app->params['productName']);
     ]);
     ?>
 </div>
+
+
+<?php
+$form = \yii\widgets\ActiveForm::begin(['action' => 'file/upload2', 'options' => ['enctype' => 'multipart/form-data']]);
+?>
+
+<?= $form->field($model, 'file')->fileInput() ?>
+
+<input type="submit">
+
+<?php \yii\widgets\ActiveForm::end() ?>
