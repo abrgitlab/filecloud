@@ -17,6 +17,9 @@ use yii\web\Response;
 class SiteController extends Controller
 {
 
+    /**
+     * @return array
+     */
     public function behaviors() {
         return [
             'access' => [
@@ -44,6 +47,9 @@ class SiteController extends Controller
         ];
     }
 
+    /**
+     * @return array
+     */
     public function actions() {
         return [
             'error' => [
@@ -52,6 +58,9 @@ class SiteController extends Controller
         ];
     }
 
+    /**
+     * @return string|Response
+     */
     public function actionLogin() {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
@@ -66,18 +75,28 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * @return Response
+     */
     public function actionLogout() {
         Yii::$app->user->logout();
 
         return $this->goHome();
     }
 
+    /**
+     * @return string
+     */
     public function actionIndex() {
         return $this->render('index', [
             'model' => new FileLoader()
         ]);
     }
 
+    /**
+     * @param string $filter
+     * @return string
+     */
     public function actionUploads($filter = 'all') {
         $this->layout = 'uploads';
 
@@ -134,16 +153,19 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function actionFileUpload() {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return Files::uploadFile();
     }
 
-    public function actionFileUpload2() {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        return Files::uploadFile2();
-    }
-
+    /**
+     * @param $shortlink
+     * @throws NotFoundHttpException
+     */
     public function actionGet($shortlink) {
         $file = Files::findOne(['shortlink' => $shortlink, 'loading_state' => Files::LOADING_STATE_LOADED]);
         if ($file) {
@@ -161,6 +183,7 @@ class SiteController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
      */
     public function actionUpdate($id) {
         $model = $this->findModel($id);
@@ -178,6 +201,9 @@ class SiteController extends Controller
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
+     * @throws NotFoundHttpException
+     * @throws \Exception
+     * @throws \yii\db\StaleObjectException
      */
     public function actionUploadsDelete($id)
     {
@@ -200,10 +226,6 @@ class SiteController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-
-//    public function actionTest() {
-//        var_dump(Yii::$app->user->getId());die;
-//    }
 
     public function render($view, $params = []) {
         if ($this->layout == null || $this->layout == 'main' || $this->layout == 'uploads')
