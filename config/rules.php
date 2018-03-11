@@ -17,7 +17,6 @@ return [
     'logout' => 'site/logout',
 
     'api/file/upload' => 'api/file-upload',
-    'api/file/upload2' => 'api/file-upload2',
 //    'api/uploads/<filter:[a-zA-Z]+>' => 'api/uploads',
     'api/uploads' => 'api/uploads',
     'api/login' => 'api/login',
