@@ -42,7 +42,7 @@ class ApiController extends Controller {
                     'roles' => ['?'],
                 ],
                 [
-                    'actions' => ['file-upload', 'uploads'],
+                    'actions' => ['file-upload', 'file-upload2', 'uploads'],
                     'allow' => true,
                     'roles' => ['@'],
                 ],
@@ -77,6 +77,10 @@ class ApiController extends Controller {
 
     public function actionFileUpload() {
         return Files::uploadFile();
+    }
+
+    public function actionFileUpload2() {
+        return Files::uploadFile2();
     }
 
     public function actionUploads() {

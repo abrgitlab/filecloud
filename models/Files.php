@@ -98,32 +98,47 @@ class Files extends ActiveRecord
     }
 
     /**
-     * @return string
+     * @return array
      * @throws \Exception
      */
     public static function uploadFile() {
-        $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]'); //TODO: выяснить, можно ли передавать несколько файлов за один запрос и что можно с етим делать
+        $tmp_file = UploadedFile::getInstanceByName('FileLoader[file]');
 
         $content_range = Yii::$app->request->headers->get('content-range');
-        preg_match('/attachment; filename="([^"]+)"/', Yii::$app->request->headers->get('content-disposition'), $content_disposition_result);
+        $content_disposition = Yii::$app->request->headers->get('content-disposition');
+        if ($content_disposition)
+            preg_match('/attachment; shortlink="([^"]+)"/', $content_disposition, $content_disposition_result);
+        else
+            $content_disposition_result = [];
 
         if ($tmp_file) {
             $response = [];
 
             if ($content_range) {
+                //Если файл загружается несколькими частями
                 $content_range = preg_split('/[^0-9]+/', $content_range);
                 $range_start = $content_range[1];
                 $range_end = $content_range[2];
                 $full_size = $content_range[3];
 
-                $file_model = Files::findOne(['title' => $tmp_file->name, 'loading_state' => Files::LOADING_STATE_IN_PROCESS, 'size' => $full_size]);
+                $file_model = null;
+                if (count($content_disposition_result) > 1)
+                    //Если загружается не первая часть файла
+                    $file_model = Files::findOne(['shortlink' => $content_disposition_result[1]]);
 
                 if (!$file_model) {
                     $file_model = new Files();
                     $file_model->title = $tmp_file->name;
-                    $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
+
                     $file_model->user_id = Yii::$app->user->getId();
-                    $file_model->size = $full_size;
+
+                    if ($full_size == 0) {
+                        $file_model->loading_state = Files::LOADING_STATE_LOADED;
+                        $file_model->size = $range_end;
+                    } else {
+                        $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
+                        $file_model->size = $full_size;
+                    }
                     $file_model->loadDefaultValues(true)->save();
 
                     do {
@@ -147,22 +162,23 @@ class Files extends ActiveRecord
 
                     $result_chunks = Chunks::addChunk($chunks, ['begin' => (int)$range_start, 'end' => (int)$range_end]);
                     $file_model->chunks = json_encode($result_chunks);
-                    if (count($result_chunks) == 1 && $result_chunks[0]['begin'] == 0 && $result_chunks[0]['end'] == $full_size - 1) {
+                    if (count($result_chunks) == 1 && $result_chunks[0]['begin'] == 0 && $result_chunks[0]['end'] == $full_size - 1 || $full_size == 0)
                         $file_model->loading_state = Files::LOADING_STATE_LOADED;
-                        $response = [
-                            'files' => [[
-                                'name' => $file_model->title,
-                                'size' => $full_size,
-                                'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
-                                'shortlink' => $file_model->shortlink,
-                            ]]
-                        ];
-                    }
+                    else
+                        $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
+                    $response = [
+                        'name' => $file_model->title,
+                        'size' => ($full_size == 0) ? $result_chunks[0]['end'] + 1 : $full_size,
+                        'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                        'shortlink' => $file_model->shortlink,
+                        'status' => ($file_model->loading_state == Files::LOADING_STATE_LOADED) ? 'full' : 'partial'
+                    ];
                     $file_model->save();
                 } else {
                     throw new ServerErrorHttpException('I can\'t create new file');
                 }
             } else {
+                //Если файл загружается одной частью
                 $file_model = new Files();
                 $file_model->title = $tmp_file->name;
                 $file_model->loading_state = Files::LOADING_STATE_LOADED;
@@ -179,12 +195,11 @@ class Files extends ActiveRecord
                 $file_path = $file_model->upload_directory . $file_model->shortlink;
                 if ($tmp_file->saveAs($file_path)) {
                     $response = [
-                        'files' => [[
-                            'name' => $file_model->title,
-                            'size' => $tmp_file->size,
-                            'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
-                            'shortlink' => $file_model->shortlink,
-                        ]]
+                        'name' => $file_model->title,
+                        'size' => $tmp_file->size,
+                        'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                        'shortlink' => $file_model->shortlink,
+                        'status' => 'full'
                     ];
                 } else {
                     throw new ServerErrorHttpException('I can\'t create new file');
@@ -197,6 +212,11 @@ class Files extends ActiveRecord
         throw new ServerErrorHttpException('Error while uploading file');
     }
 
+    /**
+     * @return false|int
+     * @throws \Exception
+     * @throws \yii\db\StaleObjectException
+     */
     public function delete() {
         unlink($this->upload_directory . $this->shortlink);
         return parent::delete();
