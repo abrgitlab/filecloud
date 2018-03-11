@@ -20,6 +20,9 @@ use yii\web\Response;
 
 class ApiController extends Controller {
 
+    /**
+     * @return array
+     */
     public function behaviors() {
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
@@ -51,11 +54,17 @@ class ApiController extends Controller {
         return $behaviors;
     }
 
+    /**
+     *
+     */
     public function init() {
         Yii::$app->user->enableSession = false;
         parent::init();
     }
 
+    /**
+     * @return array
+     */
     public function actions() {
         return [
             'error' => [
@@ -64,6 +73,9 @@ class ApiController extends Controller {
         ];
     }
 
+    /**
+     * @return LoginForm|array
+     */
     public function actionLogin() {
         $model = new LoginForm();
         $model->load(Yii::$app->request->post(), '');
@@ -75,12 +87,12 @@ class ApiController extends Controller {
         }
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function actionFileUpload() {
         return Files::uploadFile();
-    }
-
-    public function actionFileUpload2() {
-        return Files::uploadFile2();
     }
 
     public function actionUploads() {
