@@ -125,9 +125,10 @@ class Files extends ActiveRecord
                 $full_size = $content_range[3];
 
                 $file_model = null;
-                if (count($content_disposition_result) > 1)
+                if (count($content_disposition_result) > 1) {
                     //Если загружается не первая часть файла
                     $file_model = Files::findOne(['shortlink' => $content_disposition_result[1]]);
+                }
 
                 if (!$file_model) {
                     $file_model = new Files();
@@ -170,11 +171,15 @@ class Files extends ActiveRecord
                     else
                         $file_model->loading_state = Files::LOADING_STATE_IN_PROCESS;
                     $response = [
-                        'name' => $file_model->title,
-                        'size' => ($full_size == 0) ? $result_chunks[0]['end'] + 1 : $full_size,
-                        'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
-                        'shortlink' => $file_model->shortlink,
-                        'status' => ($file_model->loading_state == Files::LOADING_STATE_LOADED) ? 'full' : 'partial'
+                        'files' => [
+                            [
+                                'name' => $file_model->title,
+                                'size' => ($full_size == 0) ? $result_chunks[0]['end'] + 1 : $full_size,
+                                'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                                'shortlink' => $file_model->shortlink,
+                                'status' => ($file_model->loading_state == Files::LOADING_STATE_LOADED) ? 'full' : 'partial'
+                            ]
+                        ]
                     ];
                     $file_model->save();
                 } else {
@@ -198,11 +203,15 @@ class Files extends ActiveRecord
                 $file_path = $file_model->upload_directory . $file_model->shortlink;
                 if ($tmp_file->saveAs($file_path)) {
                     $response = [
-                        'name' => $file_model->title,
-                        'size' => $tmp_file->size,
-                        'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
-                        'shortlink' => $file_model->shortlink,
-                        'status' => 'full'
+                        'files' => [
+                            [
+                                'name' => $file_model->title,
+                                'size' => $tmp_file->size,
+                                'url' => Url::to(['site/get', 'shortlink' => $file_model->shortlink]),
+                                'shortlink' => $file_model->shortlink,
+                                'status' => 'full'
+                            ]
+                        ]
                     ];
                 } else {
                     throw new ServerErrorHttpException('I can\'t create new file');
