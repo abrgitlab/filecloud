@@ -95,6 +95,9 @@ class ApiController extends Controller {
         return Files::uploadFile();
     }
 
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
     public function actionUploads() {
         return Files::find()->select(['title', 'shortlink', 'size', 'loading_state', 'uploaded_at'])->where(['user_id' => Yii::$app->user->id])->all();
     }

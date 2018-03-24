@@ -16,6 +16,10 @@ use yii\console\Controller;
 class RbacController extends Controller
 {
 
+    /**
+     * @throws \Exception
+     * @throws \yii\base\Exception
+     */
     public function actionInit() {
         $auth = Yii::$app->authManager;
 
@@ -42,6 +46,10 @@ class RbacController extends Controller
         }
     }
 
+    /**
+     * @param $userid
+     * @throws \Exception
+     */
     public function actionAssignUser($userid) {
         $auth = Yii::$app->authManager;
 

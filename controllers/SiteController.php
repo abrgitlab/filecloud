@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\models\FileLoader;
 use app\models\LoginForm;
-use app\models\Users;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -227,6 +226,11 @@ class SiteController extends Controller
         }
     }
 
+    /**
+     * @param string $view
+     * @param array $params
+     * @return string
+     */
     public function render($view, $params = []) {
         if ($this->layout == null || $this->layout == 'main' || $this->layout == 'uploads')
             $this->view->params['navbar'] = $this->renderPartial('navbar');

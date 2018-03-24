@@ -55,6 +55,9 @@ class Files extends ActiveRecord
         return 'files';
     }
 
+    /**
+     *
+     */
     function init()
     {
         parent::init();

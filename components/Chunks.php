@@ -13,6 +13,14 @@ use yii\base\Object;
 
 class Chunks extends Object {
 
+    /**
+     * Производит наложение chunk1 на chunk2
+     *
+     * @param $chunk1
+     * @param $chunk2
+     * @param $result
+     * @return bool|null
+     */
     public static function mergeChunks($chunk1, $chunk2, &$result) {
         if ($chunk1['end'] >= $chunk2['begin'] - 1 && $chunk2['end'] >= $chunk1['begin'] - 1) {
             $result = [['begin' => min($chunk1['begin'], $chunk2['begin']), 'end' => max($chunk1['end'], $chunk2['end'])]];
@@ -26,6 +34,13 @@ class Chunks extends Object {
         }
     }
 
+    /**
+     * Добавляет в коллецию chunks новый chunk
+     *
+     * @param $chunks
+     * @param $newChunk
+     * @return array
+     */
     public static function addChunk($chunks, $newChunk) {
         $newChunks = [];
 
