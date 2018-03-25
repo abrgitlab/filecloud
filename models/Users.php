@@ -70,7 +70,7 @@ class Users extends ActiveRecord implements IdentityInterface
      * or the identity is not in an active state (disabled, deleted, etc.)
      */
     public static function findIdentity($id) {
-        return self::find()->where(['id' => $id])->one();
+        return static::findOne($id);
     }
 
     /**
@@ -90,7 +90,7 @@ class Users extends ActiveRecord implements IdentityInterface
             if (!isset($payload->jti))
                 return null;
 
-            $identity = self::find()->where(['id' => $payload->jti])->one();
+            $identity = self::findOne($payload->jti);
             if (!$jwt->verify($identity['secret'], 'HS256'))
                 return null;
 
@@ -98,19 +98,6 @@ class Users extends ActiveRecord implements IdentityInterface
         }
 
         return null;
-
-//        $tks = explode('.', $token);
-//        list($headb64, $bodyb64, $cryptob64) = $tks;
-//        $payload = JWT::jsonDecode(JWT::urlsafeB64Decode($bodyb64));
-//
-//        if (!$payload->jti)
-//            return null;
-//
-//        $identity = self::find()->where(['id' => $payload->jti])->one();
-//        JWT::decode($token, $identity->secret, 'HS256');
-//        var_dump($identity);die;
-//        $payload['jti'];
-        // TODO: Implement findIdentityByAccessToken() method.
     }
 
     /**

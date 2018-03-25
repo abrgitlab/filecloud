@@ -230,7 +230,10 @@ class Files extends ActiveRecord
      * @throws \yii\db\StaleObjectException
      */
     public function delete() {
-        unlink($this->upload_directory . $this->shortlink);
+        $filename = $this->upload_directory . $this->shortlink;
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
         return parent::delete();
     }
 
